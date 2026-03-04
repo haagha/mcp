@@ -4,19 +4,19 @@
 using System.Diagnostics;
 using System.Net;
 using System.Text.Json.Nodes;
-using Azure.Mcp.Core.Areas.Server.Commands.Discovery;
-using Azure.Mcp.Core.Areas.Server.Models;
-using Azure.Mcp.Core.Areas.Server.Options;
 using Azure.Mcp.Core.Commands;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Mcp.Core.Areas.Server.Commands.Discovery;
+using Microsoft.Mcp.Core.Areas.Server.Models;
+using Microsoft.Mcp.Core.Areas.Server.Options;
 using Microsoft.Mcp.Core.Commands;
 using Microsoft.Mcp.Core.Helpers;
 using Microsoft.Mcp.Core.Models.Command;
 using ModelContextProtocol;
 using ModelContextProtocol.Protocol;
 
-namespace Azure.Mcp.Core.Areas.Server.Commands.ToolLoading;
+namespace Microsoft.Mcp.Core.Areas.Server.Commands.ToolLoading;
 
 /// <summary>
 /// A tool loader that exposes Azure command groups as hierarchical namespace tools with direct in-process execution.
@@ -24,16 +24,15 @@ namespace Azure.Mcp.Core.Areas.Server.Commands.ToolLoading;
 /// Supports learn functionality for progressive discovery of commands within each namespace.
 /// </summary>
 public sealed class NamespaceToolLoader(
-    CommandFactory commandFactory,
+    ICommandFactory commandFactory,
     IOptions<ServiceStartOptions> options,
     IServiceProvider serviceProvider,
     ILogger<NamespaceToolLoader> logger,
     bool applyFilter = true) : BaseToolLoader(logger)
 {
-    private readonly CommandFactory _commandFactory = commandFactory ?? throw new ArgumentNullException(nameof(commandFactory));
+    private readonly ICommandFactory _commandFactory = commandFactory ?? throw new ArgumentNullException(nameof(commandFactory));
     private readonly IOptions<ServiceStartOptions> _options = options ?? throw new ArgumentNullException(nameof(options));
     private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-    private readonly bool _applyFilter = applyFilter;
 
     private readonly Lazy<IReadOnlyList<string>> _availableNamespaces = new(() =>
     {
@@ -48,7 +47,7 @@ public sealed class NamespaceToolLoader(
                                options.Value.Namespace.Contains(group.Name, StringComparer.OrdinalIgnoreCase));
         }
 
-        return allSubGroups.Select(group => group.Name).ToList();
+        return [.. allSubGroups.Select(group => group.Name)];
     });
 
     private readonly Dictionary<string, List<Tool>> _cachedToolLists = new(StringComparer.OrdinalIgnoreCase);
@@ -108,7 +107,7 @@ public sealed class NamespaceToolLoader(
         var namespaces = _availableNamespaces.Value;
         var allToolsResponse = new ListToolsResult
         {
-            Tools = new List<Tool>()
+            Tools = []
         };
 
         foreach (var namespaceName in namespaces)
@@ -146,6 +145,7 @@ public sealed class NamespaceToolLoader(
 
     public override async ValueTask<CallToolResult> CallToolHandler(RequestContext<CallToolRequestParams> request, CancellationToken cancellationToken)
     {
+        Activity.Current?.SetTag(TagName.IsServerCommandInvoked, false);
         if (string.IsNullOrWhiteSpace(request.Params?.Name))
         {
             throw new ArgumentNullException(nameof(request.Params.Name), "Tool name cannot be null or empty.");
@@ -283,7 +283,6 @@ public sealed class NamespaceToolLoader(
             };
         }
 
-        Activity.Current?.SetTag(TagName.IsServerCommandInvoked, true);
         IReadOnlyDictionary<string, IBaseCommand> namespaceCommands;
         try
         {
@@ -368,7 +367,9 @@ public sealed class NamespaceToolLoader(
             // It is possible that the command provided by the LLM is not one that exists, such as "blob-list".
             // The logic above performs sampling to try and get a correct command name.  "blob_get" in
             // this case, which will be executed.
-            currentActivity?.SetTag(TagName.ToolName, command).SetTag(TagName.ToolId, cmd.Id);
+            currentActivity?.SetTag(TagName.ToolName, command)
+                .SetTag(TagName.ToolId, cmd.Id)
+                .SetTag(TagName.IsServerCommandInvoked, true);
 
             var commandResponse = await cmd.ExecuteAsync(commandContext, commandOptions, cancellationToken);
             var jsonResponse = JsonSerializer.Serialize(commandResponse, ModelsJsonContext.Default.CommandResponse);
@@ -379,13 +380,19 @@ public sealed class NamespaceToolLoader(
                 var childToolSpecJson = GetChildToolJson(request, namespaceName, command);
 
                 _logger.LogWarning("Namespace {Namespace} command {Command} requires additional parameters.", namespaceName, command);
+
+                // Extract the specific error message from the response
+                var errorMessage = string.IsNullOrEmpty(commandResponse.Message)
+                    ? $"The '{command}' command is missing required parameters."
+                    : commandResponse.Message;
+
                 var finalResponse = new CallToolResult
                 {
                     Content =
                     [
                         new TextContentBlock {
                                 Text = $"""
-                                    The '{command}' command is missing required parameters.
+                                    {errorMessage}
 
                                     - Review the following command spec and identify the required arguments from the input schema.
                                     - Omit any arguments that are not required or do not apply to your use case.
@@ -590,7 +597,7 @@ public sealed class NamespaceToolLoader(
     {
         if (args == null || !args.TryGetValue("parameters", out var paramsElem))
         {
-            return new Dictionary<string, JsonElement>();
+            return [];
         }
 
         if (paramsElem.ValueKind == JsonValueKind.Object)
@@ -599,7 +606,7 @@ public sealed class NamespaceToolLoader(
                 .ToDictionary(prop => prop.Name, prop => prop.Value);
         }
 
-        return new Dictionary<string, JsonElement>();
+        return [];
     }
 
     private static bool SupportsSampling(McpServer server)
@@ -689,7 +696,7 @@ public sealed class NamespaceToolLoader(
                 }
                 if (root.TryGetProperty("parameters", out var parametersElem) && parametersElem.ValueKind == JsonValueKind.Object)
                 {
-                    parameters = parametersElem.EnumerateObject().ToDictionary(prop => prop.Name, prop => prop.Value.Clone()) ?? new Dictionary<string, JsonElement>();
+                    parameters = parametersElem.EnumerateObject().ToDictionary(prop => prop.Name, prop => prop.Value.Clone()) ?? [];
                 }
             }
 

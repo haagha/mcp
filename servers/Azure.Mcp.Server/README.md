@@ -877,14 +877,18 @@ Check out the remote hosting [azd templates](https://github.com/microsoft/mcp/bl
 
 ### 🕸️ Azure App Service
 
-* "List the websites in my subscription"
-* "Show me the websites in my 'my-resource-group' resource group"
-* "Get the details for website 'my-website'"
-* "Get the details for app service plan 'my-app-service-plan'"
+* "Add a database connection for an App Service web app"
+* "List the web apps in my subscription"
+* "Show me the web apps in my 'my-resource-group' resource group"
+* "Get the details for web app 'my-webapp' in 'my-resource-group'"
 
 ### 🖥️ Azure CLI Generate
 
 * Generate Azure CLI commands based on user intent
+
+Example prompts that generate Azure CLI commands:
+
+* "Get the details for app service plan 'my-app-service-plan'"
 
 ### 🖥️ Azure CLI Install
 
@@ -902,14 +906,23 @@ Check out the remote hosting [azd templates](https://github.com/microsoft/mcp/bl
 * "Send an email from my communication service endpoint with custom sender name and multiple recipients"
 * "Send an email to 'user1@example.com' and 'user2@example.com' with subject 'Team Update' and message 'Please review the attached document.'"
 
-### � Azure Compute
+### 🖥️ Azure Compute
 
+* "List all my managed disks in subscription 'my-subscription'"
+* "Show me all disks in resource group 'my-resource-group'"
+* "Get details of disk 'my-disk' in resource group 'my-resource-group'"
 * "List all virtual machines in my subscription"
 * "Show me all VMs in resource group 'my-resource-group'"
 * "Get details for virtual machine 'my-vm' in resource group 'my-resource-group'"
 * "Get virtual machine 'my-vm' with instance view including power state and runtime status"
 * "Show me the power state and provisioning status of VM 'my-vm'"
 * "What is the current status of my virtual machine 'my-vm'?"
+* "Create a new VM named 'my-vm' in resource group 'my-rg' for web workloads"
+* "Create a Linux VM with Ubuntu 22.04 and SSH key authentication"
+* "Create a development VM with Standard_B2s size in East US"
+* "Update VM 'my-vm' tags to environment=production"
+* "Create a VMSS named 'my-vmss' with 3 instances for web workloads"
+* "Update VMSS 'my-vmss' capacity to 5 instances"
 
 ### �📦 Azure Container Apps
 
@@ -1047,7 +1060,7 @@ The Azure MCP Server provides tools for interacting with **42+ Azure service are
 - 🛡️ **Azure Best Practices** - Secure, production-grade guidance
 - 🖥️ **Azure CLI Generate** - Generate Azure CLI commands from natural language
 - 📞 **Azure Communication Services** - SMS messaging and communication
-- � **Azure Compute** - Virtual Machine and Virtual Machine Scale Set management
+- � **Azure Compute** - Virtual Machine, Virtual Machine Scale Set, and Disk management
 - �🔐 **Azure Confidential Ledger** - Tamper-proof ledger operations
 - 📦 **Azure Container Apps** - Container hosting
 - 📦 **Azure Container Registry (ACR)** - Container registry management
@@ -1074,6 +1087,7 @@ The Azure MCP Server provides tools for interacting with **42+ Azure service are
 - 🔴 **Azure Redis Cache** - In-memory data store
 - 🏗️ **Azure Resource Groups** - Resource organization
 - 🚌 **Azure Service Bus** - Message queuing
+- 🧵 **Azure Service Fabric** - Managed cluster node operations
 - 🏥 **Azure Service Health** - Resource health status and availability
 - 🗄️ **Azure SQL Database** - Relational database management
 - 🗄️ **Azure SQL Elastic Pool** - Database resource sharing
@@ -1093,10 +1107,12 @@ The Azure MCP Server provides tools for interacting with **42+ Azure service are
 
 - See our [official documentation on learn.microsoft.com](https://learn.microsoft.com/azure/developer/azure-mcp-server/) to learn how to use the Azure MCP Server to interact with Azure resources through natural language commands from AI agents and other types of clients.
 - For additional command documentation and examples, see [Azure MCP Commands](https://github.com/microsoft/mcp/blob/main/servers/Azure.Mcp.Server/docs/azmcp-commands.md).
+- Use [Prompt Templates](https://github.com/microsoft/mcp/blob/main/docs/prompt-templates.md) to set tenant and subscription context once at the beginning of your Copilot session, avoiding repetitive information in subsequent prompts.
 
 ## Feedback and Support
 
 - Check the [Troubleshooting guide](https://aka.ms/azmcp/troubleshooting) to diagnose and resolve common issues with the Azure MCP Server.
+- Review the [Known Issues](https://github.com/microsoft/mcp/blob/main/servers/Azure.Mcp.Server/KNOWN-ISSUES.md) for current limitations and workarounds.
 - For advanced troubleshooting, you can enable [support logging](https://github.com/microsoft/mcp/blob/main/servers/Azure.Mcp.Server/TROUBLESHOOTING.md#support-logging) using the `--dangerously-write-support-logs-to-dir` option.
 - We're building this in the open. Your feedback is much appreciated, and will help us shape the future of the Azure MCP server.
     - 👉 [Open an issue](https://github.com/microsoft/mcp/issues) in the public GitHub repository — we’d love to hear from you!

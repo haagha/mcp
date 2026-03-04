@@ -254,7 +254,8 @@ azmcp server info
 
 ```bash
 # List Advisor recommendations in a subscription
-azmcp advisor recommendations list --subscription <subscription>
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp advisor recommendation list --subscription <subscription>
 ```
 
 ### Azure AI Search Operations
@@ -470,6 +471,8 @@ azmcp applicationinsights recommendation list --subscription <subscription> \
 
 ### Azure App Service Operations
 
+#### Databases
+
 ```bash
 # Add a database connection to an App Service
 # ❌ Destructive | ❌ Idempotent | ✅ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
@@ -539,6 +542,32 @@ azmcp appservice database add --subscription "my-subscription" \
 -   `--connection-string`: Custom connection string (optional - auto-generated if not provided)
 -   `--tenant`: Azure tenant ID for authentication (optional)
 
+#### Web Apps
+
+```bash
+# Get App Service Web App details
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp appservice webapps get --subscription <subscription> \
+                             [--resource-group <resource-group>] \
+                             [--app <app>]
+
+# Examples:
+# List the App Service Web Apps details in a subscription
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp appservice webapps get --subscription "my-subscription"
+
+# List the App Service Web Apps details in a resource group
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp appservice webapps get --subscription "my-subscription" \
+                             --resource-group "my-resource-group"
+
+# Get the details for a specific App Service Web App
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp appservice webapps get --subscription "my-subscription" \
+                             --resource-group "my-resource-group" \
+                             --app "my-app"
+```
+
 ### Azure CLI Operations
 
 #### Generate
@@ -557,113 +586,6 @@ azmcp extension cli generate --cli-type <cli-type>
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ✅ LocalRequired
 azmcp extension cli install --cli-type <cli-type>
 ```
-
-### Azure Compute Operations
-
-#### Virtual Machines
-
-```bash
-# Get Virtual Machine(s) - behavior depends on provided parameters
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vm get --subscription <subscription> \
-                     [--resource-group <resource-group>] \
-                     [--vm-name <vm-name>] \
-                     [--instance-view]
-
-# Examples:
-
-# List all VMs in subscription
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vm get --subscription "my-subscription"
-
-# List all VMs in a resource group
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vm get --subscription "my-subscription" \
-                     --resource-group "my-rg"
-
-# Get specific VM details
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vm get --subscription "my-subscription" \
-                     --resource-group "my-rg" \
-                     --vm-name "my-vm"
-
-# Get specific VM with instance view (runtime status)
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vm get --subscription "my-subscription" \
-                     --resource-group "my-rg" \
-                     --vm-name "my-vm" \
-                     --instance-view
-```
-
-**Command Behavior:**
-- **With `--vm-name`**: Gets detailed information about a specific VM (requires `--resource-group`). Optionally include `--instance-view` for runtime status.
-- **With `--resource-group` only**: Lists all VMs in the specified resource group.
-- **With neither**: Lists all VMs in the subscription.
-
-**Returns:**
-- VM information including name, location, VM size, provisioning state, OS type, license type, zones, and tags.
-- When `--instance-view` is specified: Also includes power state, provisioning state, VM agent status, disk status, and extension status.
-
-**Parameters:**
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `--subscription` | Yes | Azure subscription ID |
-| `--resource-group`, `-g` | Conditional | Resource group name (required when using `--vm-name`) |
-| `--vm-name`, `--name` | No | Name of the virtual machine |
-| `--instance-view` | No | Include instance view details (only available with `--vm-name`) |
-
-#### Virtual Machine Scale Sets
-
-```bash
-# Get Virtual Machine Scale Set(s) - behavior depends on provided parameters
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vmss get --subscription <subscription> \
-                       [--resource-group <resource-group>] \
-                       [--vmss-name <vmss-name>] \
-                       [--instance-id <instance-id>]
-
-# Examples:
-
-# List all VMSS in subscription
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vmss get --subscription "my-subscription"
-
-# List all VMSS in a resource group
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vmss get --subscription "my-subscription" \
-                       --resource-group "my-rg"
-
-# Get specific VMSS details
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vmss get --subscription "my-subscription" \
-                       --resource-group "my-rg" \
-                       --vmss-name "my-vmss"
-
-# Get specific VM instance in a VMSS
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp compute vmss get --subscription "my-subscription" \
-                       --resource-group "my-rg" \
-                       --vmss-name "my-vmss" \
-                       --instance-id "0"
-```
-
-**Command Behavior:**
-- **With `--instance-id`**: Gets detailed information about a specific VM instance in the scale set (requires `--vmss-name` and `--resource-group`).
-- **With `--vmss-name`**: Gets detailed information about a specific VMSS (requires `--resource-group`).
-- **With `--resource-group` only**: Lists all VMSS in the specified resource group.
-- **With neither**: Lists all VMSS in the subscription.
-
-**Returns:**
-- VMSS information including name, location, SKU, capacity, provisioning state, upgrade policy, overprovision setting, zones, and tags.
-- When `--instance-id` is specified: Returns VM instance information including instance ID, name, location, VM size, provisioning state, OS type, zones, and tags.
-
-**Parameters:**
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `--subscription` | Yes | Azure subscription ID |
-| `--resource-group`, `-g` | Conditional | Resource group name (required when using `--vmss-name`) |
-| `--vmss-name` | No | Name of the virtual machine scale set |
-| `--instance-id` | No | Instance ID of the VM in the scale set (requires `--vmss-name`) |
 
 ### Azure Communication Services Operations
 
@@ -764,6 +686,399 @@ azmcp communication sms send --endpoint "https://mycomms.communication.azure.com
 -   `--enable-delivery-report`: Enable delivery reporting for the SMS message (optional)
 -   `--tag`: Custom tag for message tracking (optional)
 
+
+### Azure Compute Operations
+
+#### Virtual Machines
+
+```bash
+# Get Virtual Machine(s) - behavior depends on provided parameters
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vm get --subscription <subscription> \
+                     [--resource-group <resource-group>] \
+                     [--vm-name <vm-name>] \
+                     [--instance-view]
+
+# Examples:
+
+# List all VMs in subscription
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vm get --subscription "my-subscription"
+
+# List all VMs in a resource group
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vm get --subscription "my-subscription" \
+                     --resource-group "my-rg"
+
+# Get specific VM details
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vm get --subscription "my-subscription" \
+                     --resource-group "my-rg" \
+                     --vm-name "my-vm"
+
+# Get specific VM with instance view (runtime status)
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vm get --subscription "my-subscription" \
+                     --resource-group "my-rg" \
+                     --vm-name "my-vm" \
+                     --instance-view
+```
+
+**Command Behavior:**
+- **With `--vm-name`**: Gets detailed information about a specific VM (requires `--resource-group`). Optionally include `--instance-view` for runtime status.
+- **With `--resource-group` only**: Lists all VMs in the specified resource group.
+- **With neither**: Lists all VMs in the subscription.
+
+**Returns:**
+- VM information including name, location, VM size, provisioning state, OS type, license type, zones, and tags.
+- When `--instance-view` is specified: Also includes power state, provisioning state, VM agent status, disk status, and extension status.
+
+**Parameters:**
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `--subscription` | Yes | Azure subscription ID |
+| `--resource-group`, `-g` | Conditional | Resource group name (required when using `--vm-name`) |
+| `--vm-name`, `--name` | No | Name of the virtual machine |
+| `--instance-view` | No | Include instance view details (only available with `--vm-name`) |
+
+```bash
+# Create Virtual Machine with smart defaults based on workload requirements
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ✅ Secret | ❌ LocalRequired
+azmcp compute vm create --subscription <subscription> \
+                        --resource-group <resource-group> \
+                        --vm-name <vm-name> \
+                        --location <location> \
+                        --admin-username <admin-username> \
+                        [--admin-password <admin-password>] \
+                        [--ssh-public-key <ssh-public-key>] \
+                        [--vm-size <vm-size>] \
+                        [--image <image>] \
+                        [--workload <workload>] \
+                        [--os-type <os-type>] \
+                        [--virtual-network <virtual-network>] \
+                        [--subnet <subnet>] \
+                        [--public-ip-address <public-ip-address>] \
+                        [--network-security-group <network-security-group>] \
+                        [--no-public-ip] \
+                        [--zone <zone>] \
+                        [--os-disk-size-gb <os-disk-size-gb>] \
+                        [--os-disk-type <os-disk-type>]
+
+# Examples:
+
+# Create Linux VM with SSH key (development workload)
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ✅ Secret | ❌ LocalRequired
+azmcp compute vm create --subscription "my-subscription" \
+                        --resource-group "my-rg" \
+                        --vm-name "my-linux-vm" \
+                        --location "eastus" \
+                        --admin-username "azureuser" \
+                        --ssh-public-key "ssh-ed25519 AAAAC3..." \
+                        --workload "development"
+
+# Create Windows VM with password
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ✅ Secret | ❌ LocalRequired
+azmcp compute vm create --subscription "my-subscription" \
+                        --resource-group "my-rg" \
+                        --vm-name "my-win-vm" \
+                        --location "eastus" \
+                        --admin-username "adminuser" \
+                        --admin-password "ComplexPassword123!" \
+                        --image "Win2022Datacenter" \
+                        --workload "web"
+
+# Create VM with specific size and no public IP
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ✅ Secret | ❌ LocalRequired
+azmcp compute vm create --subscription "my-subscription" \
+                        --resource-group "my-rg" \
+                        --vm-name "my-private-vm" \
+                        --location "eastus" \
+                        --admin-username "azureuser" \
+                        --ssh-public-key "ssh-ed25519 AAAAC3..." \
+                        --vm-size "Standard_D4s_v3" \
+                        --no-public-ip
+```
+
+**Workload Types:**
+- `development`: Standard_B2s - Cost-effective burstable VM for dev/test
+- `web`: Standard_D2s_v3 - General purpose for web servers
+- `database`: Standard_E4s_v3 - Memory-optimized for databases
+- `compute`: Standard_F4s_v2 - CPU-optimized for batch processing
+- `memory`: Standard_E8s_v3 - High-memory for caching
+- `gpu`: Standard_NC6s_v3 - GPU-enabled for ML/rendering
+- `general`: Standard_D2s_v3 - Balanced general purpose (default)
+
+**Image Aliases:**
+- Linux: `Ubuntu2404`, `Ubuntu2204`, `Ubuntu2004`, `Debian11`, `Debian12`, `RHEL9`, `CentOS8`
+- Windows: `Win2022Datacenter`, `Win2019Datacenter`, `Win11Pro`, `Win10Pro`
+
+**Parameters:**
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `--subscription` | Yes | Azure subscription ID |
+| `--resource-group`, `-g` | Yes | Resource group name |
+| `--vm-name` | Yes | Name of the virtual machine |
+| `--location` | Yes | Azure region |
+| `--admin-username` | Yes | Admin username |
+| `--admin-password` | Conditional | Admin password (required for Windows, optional for Linux) |
+| `--ssh-public-key` | Conditional | SSH public key (for Linux VMs) |
+| `--vm-size` | No | VM size (defaults based on workload) |
+| `--image` | No | Image alias or URN (default: Ubuntu2404) |
+| `--workload` | No | Workload type for smart defaults |
+| `--os-type` | No | OS type: 'linux' or 'windows' (auto-detected from image) |
+| `--virtual-network` | No | Virtual network name |
+| `--subnet` | No | Subnet name |
+| `--public-ip-address` | No | Public IP address name |
+| `--network-security-group` | No | Network security group name |
+| `--no-public-ip` | No | Do not create a public IP address |
+| `--zone` | No | Availability zone |
+| `--os-disk-size-gb` | No | OS disk size in GB |
+| `--os-disk-type` | No | OS disk type: 'Premium_LRS', 'StandardSSD_LRS', 'Standard_LRS' |
+
+```bash
+# Update Virtual Machine configuration
+# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vm update --subscription <subscription> \
+                        --resource-group <resource-group> \
+                        --vm-name <vm-name> \
+                        [--vm-size <vm-size>] \
+                        [--tags <tags>] \
+                        [--license-type <license-type>] \
+                        [--boot-diagnostics <boot-diagnostics>] \
+                        [--user-data <user-data>]
+
+# Examples:
+
+# Add tags to a VM
+# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vm update --subscription "my-subscription" \
+                        --resource-group "my-rg" \
+                        --vm-name "my-vm" \
+                        --tags "environment=prod,team=compute"
+
+# Enable Azure Hybrid Benefit
+# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vm update --subscription "my-subscription" \
+                        --resource-group "my-rg" \
+                        --vm-name "my-vm" \
+                        --license-type "Windows_Server"
+
+# Enable boot diagnostics
+# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vm update --subscription "my-subscription" \
+                        --resource-group "my-rg" \
+                        --vm-name "my-vm" \
+                        --boot-diagnostics "true"
+```
+
+**Parameters:**
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `--subscription` | Yes | Azure subscription ID |
+| `--resource-group`, `-g` | Yes | Resource group name |
+| `--vm-name` | Yes | Name of the virtual machine |
+| `--vm-size` | No | New VM size (may require VM to be deallocated) |
+| `--tags` | No | Tags in key=value,key2=value2 format |
+| `--license-type` | No | License type: 'Windows_Server', 'RHEL_BYOS', 'SLES_BYOS', 'None' |
+| `--boot-diagnostics` | No | Enable or disable boot diagnostics: 'true' or 'false' |
+| `--user-data` | No | Base64-encoded user data |
+
+#### Virtual Machine Scale Sets
+
+```bash
+# Get Virtual Machine Scale Set(s) - behavior depends on provided parameters
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vmss get --subscription <subscription> \
+                       [--resource-group <resource-group>] \
+                       [--vmss-name <vmss-name>] \
+                       [--instance-id <instance-id>]
+
+# Examples:
+
+# List all VMSS in subscription
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vmss get --subscription "my-subscription"
+
+# List all VMSS in a resource group
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vmss get --subscription "my-subscription" \
+                       --resource-group "my-rg"
+
+# Get specific VMSS details
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vmss get --subscription "my-subscription" \
+                       --resource-group "my-rg" \
+                       --vmss-name "my-vmss"
+
+# Get specific VM instance in a VMSS
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vmss get --subscription "my-subscription" \
+                       --resource-group "my-rg" \
+                       --vmss-name "my-vmss" \
+                       --instance-id "0"
+```
+
+**Command Behavior:**
+- **With `--instance-id`**: Gets detailed information about a specific VM instance in the scale set (requires `--vmss-name` and `--resource-group`).
+- **With `--vmss-name`**: Gets detailed information about a specific VMSS (requires `--resource-group`).
+- **With `--resource-group` only**: Lists all VMSS in the specified resource group.
+- **With neither**: Lists all VMSS in the subscription.
+
+**Returns:**
+- VMSS information including name, location, SKU, capacity, provisioning state, upgrade policy, overprovision setting, zones, and tags.
+- When `--instance-id` is specified: Returns VM instance information including instance ID, name, location, VM size, provisioning state, OS type, zones, and tags.
+
+**Parameters:**
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `--subscription` | Yes | Azure subscription ID |
+| `--resource-group`, `-g` | Conditional | Resource group name (required when using `--vmss-name`) |
+| `--vmss-name` | No | Name of the virtual machine scale set |
+| `--instance-id` | No | Instance ID of the VM in the scale set (requires `--vmss-name`) |
+
+```bash
+# Create Virtual Machine Scale Set with smart defaults based on workload requirements
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ✅ Secret | ❌ LocalRequired
+azmcp compute vmss create --subscription <subscription> \
+                          --resource-group <resource-group> \
+                          --vmss-name <vmss-name> \
+                          --location <location> \
+                          --admin-username <admin-username> \
+                          [--admin-password <admin-password>] \
+                          [--ssh-public-key <ssh-public-key>] \
+                          [--vm-size <vm-size>] \
+                          [--image <image>] \
+                          [--workload <workload>] \
+                          [--os-type <os-type>] \
+                          [--virtual-network <virtual-network>] \
+                          [--subnet <subnet>] \
+                          [--instance-count <instance-count>] \
+                          [--upgrade-policy <upgrade-policy>] \
+                          [--zone <zone>] \
+                          [--os-disk-size-gb <os-disk-size-gb>] \
+                          [--os-disk-type <os-disk-type>]
+
+# Examples:
+
+# Create Linux VMSS with SSH key
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ✅ Secret | ❌ LocalRequired
+azmcp compute vmss create --subscription "my-subscription" \
+                          --resource-group "my-rg" \
+                          --vmss-name "my-vmss" \
+                          --location "eastus" \
+                          --admin-username "azureuser" \
+                          --ssh-public-key "ssh-ed25519 AAAAC3..." \
+                          --instance-count 3
+
+# Create Windows VMSS with automatic upgrade policy
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ✅ Secret | ❌ LocalRequired
+azmcp compute vmss create --subscription "my-subscription" \
+                          --resource-group "my-rg" \
+                          --vmss-name "my-win-vmss" \
+                          --location "eastus" \
+                          --admin-username "adminuser" \
+                          --admin-password "ComplexPassword123!" \
+                          --image "Win2022Datacenter" \
+                          --upgrade-policy "Automatic"
+```
+
+**Parameters:**
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `--subscription` | Yes | Azure subscription ID |
+| `--resource-group`, `-g` | Yes | Resource group name |
+| `--vmss-name` | Yes | Name of the VMSS (max 9 chars for Windows) |
+| `--location` | Yes | Azure region |
+| `--admin-username` | Yes | Admin username |
+| `--admin-password` | Conditional | Admin password (required for Windows) |
+| `--ssh-public-key` | Conditional | SSH public key (for Linux VMSS) |
+| `--vm-size` | No | VM size (defaults based on workload) |
+| `--image` | No | Image alias or URN (default: Ubuntu2404) |
+| `--workload` | No | Workload type for smart defaults |
+| `--os-type` | No | OS type: 'linux' or 'windows' |
+| `--virtual-network` | No | Virtual network name |
+| `--subnet` | No | Subnet name |
+| `--instance-count` | No | Number of VM instances (default: 2) |
+| `--upgrade-policy` | No | Upgrade policy: 'Automatic', 'Manual', 'Rolling' (default: 'Manual') |
+| `--zone` | No | Availability zone |
+| `--os-disk-size-gb` | No | OS disk size in GB |
+| `--os-disk-type` | No | OS disk type |
+
+```bash
+# Update Virtual Machine Scale Set configuration
+# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vmss update --subscription <subscription> \
+                          --resource-group <resource-group> \
+                          --vmss-name <vmss-name> \
+                          [--capacity <capacity>] \
+                          [--vm-size <vm-size>] \
+                          [--upgrade-policy <upgrade-policy>] \
+                          [--overprovision] \
+                          [--enable-auto-os-upgrade] \
+                          [--scale-in-policy <scale-in-policy>] \
+                          [--tags <tags>]
+
+# Examples:
+
+# Scale VMSS to 5 instances
+# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vmss update --subscription "my-subscription" \
+                          --resource-group "my-rg" \
+                          --vmss-name "my-vmss" \
+                          --capacity 5
+
+# Enable automatic OS upgrades
+# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vmss update --subscription "my-subscription" \
+                          --resource-group "my-rg" \
+                          --vmss-name "my-vmss" \
+                          --enable-auto-os-upgrade true
+
+# Set scale-in policy to remove oldest VMs first
+# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute vmss update --subscription "my-subscription" \
+                          --resource-group "my-rg" \
+                          --vmss-name "my-vmss" \
+                          --scale-in-policy "OldestVM"
+```
+
+**Parameters:**
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `--subscription` | Yes | Azure subscription ID |
+| `--resource-group`, `-g` | Yes | Resource group name |
+| `--vmss-name` | Yes | Name of the VMSS |
+| `--capacity` | No | Number of VM instances |
+| `--vm-size` | No | VM size |
+| `--upgrade-policy` | No | Upgrade policy: 'Automatic', 'Manual', 'Rolling' |
+| `--overprovision` | No | Enable or disable overprovisioning |
+| `--enable-auto-os-upgrade` | No | Enable automatic OS image upgrades |
+| `--scale-in-policy` | No | Scale-in policy: 'Default', 'OldestVM', 'NewestVM' |
+| `--tags` | No | Tags in key=value,key2=value2 format |
+
+#### Disks
+
+```bash
+# List all managed disks in a subscription
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute disk get --subscription <subscription>
+
+# List all managed disks in a specific resource group
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute disk get --subscription <subscription> \
+                       --resource-group <resource-group>
+
+# Get details of a specific managed disk
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp compute disk get --subscription <subscription> \
+                       --resource-group <resource-group> \
+                       --disk <disk-name>
+```
+
+**Options:**
+-   `--disk`: The name of the managed disk (optional - if not provided, lists all disks)
+-   `--resource-group`: The resource group to filter by (optional - if not provided, lists disks across all resource groups; required when specifying a disk name)
+-   `--subscription`: Azure subscription ID or name (optional - defaults to AZURE_SUBSCRIPTION_ID environment variable)
 
 ### Azure Confidential Ledger Operations
 
@@ -886,15 +1201,17 @@ azmcp kusto query [--cluster-uri <cluster-uri> | --subscription <subscription> -
 
 ### Azure Database for MySQL Operations
 
-#### Database
-
 ```bash
-# List all databases in a MySQL server
+# Hierarchical list command for MySQL resources
+# Without parameters: lists all MySQL servers in the resource group
+# With --server: lists all databases on that server
+# With --server and --database: lists all tables in that database
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp mysql database list --subscription <subscription> \
-                          --resource-group <resource-group> \
-                          --user <user> \
-                          --server <server>
+azmcp mysql list --subscription <subscription> \
+                 --resource-group <resource-group> \
+                 --user <user> \
+                 [--server <server>] \
+                 [--database <database>]
 
 # Executes a SELECT query on a MySQL Database. The query must start with SELECT and cannot contain any destructive SQL operations for security reasons.
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
@@ -904,18 +1221,6 @@ azmcp mysql database query --subscription <subscription> \
                            --server <server> \
                            --database <database> \
                            --query <query>
-```
-
-#### Table
-
-```bash
-# List all tables in a MySQL database
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp mysql table list --subscription <subscription> \
-                       --resource-group <resource-group> \
-                       --user <user> \
-                       --server <server> \
-                       --database <database>
 
 # Get the schema of a specific table in a MySQL database
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
@@ -925,23 +1230,13 @@ azmcp mysql table schema get --subscription <subscription> \
                              --server <server> \
                              --database <database> \
                              --table <table>
-```
 
-#### Server
-
-```bash
 # Retrieve the configuration of a MySQL server
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
 azmcp mysql server config get --subscription <subscription> \
                               --resource-group <resource-group> \
                               --user <user> \
                               --server <server>
-
-# List all MySQL servers in a subscription & resource group
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp mysql server list --subscription <subscription> \
-                        --resource-group <resource-group> \
-                        --user <user>
 
 # Retrieve a specific parameter of a MySQL server
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
@@ -963,15 +1258,17 @@ azmcp mysql server param set --subscription <subscription> \
 
 ### Azure Database for PostgreSQL Operations
 
-#### Database
-
 ```bash
-# List all databases in a PostgreSQL server
+# Hierarchical list command for PostgreSQL resources
+# Without parameters: lists all PostgreSQL servers in the resource group
+# With --server: lists all databases on that server
+# With --server and --database: lists all tables in that database
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp postgres database list --subscription <subscription> \
-                             --resource-group <resource-group> \
-                             --user <user> \
-                             --server <server>
+azmcp postgres list --subscription <subscription> \
+                    --resource-group <resource-group> \
+                    --user <user> \
+                    [--server <server>] \
+                    [--database <database>]
 
 # Execute a query on a PostgreSQL database
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
@@ -981,18 +1278,6 @@ azmcp postgres database query --subscription <subscription> \
                               --server <server> \
                               --database <database> \
                               --query <query>
-```
-
-#### Table
-
-```bash
-# List all tables in a PostgreSQL database
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp postgres table list --subscription <subscription> \
-                          --resource-group <resource-group> \
-                          --user <user> \
-                          --server <server> \
-                          --database <database>
 
 # Get the schema of a specific table in a PostgreSQL database
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
@@ -1002,23 +1287,13 @@ azmcp postgres table schema get --subscription <subscription> \
                                 --server <server> \
                                 --database <database> \
                                 --table <table>
-```
 
-#### Server
-
-```bash
 # Retrieve the configuration of a PostgreSQL server
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
 azmcp postgres server config get --subscription <subscription> \
                                  --resource-group <resource-group> \
                                  --user <user> \
                                  --server <server>
-
-# List all PostgreSQL servers in a subscription & resource group
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp postgres server list --subscription <subscription> \
-                           --resource-group <resource-group> \
-                           --user <user>
 
 # Retrieve a specific parameter of a PostgreSQL server
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
@@ -1311,11 +1586,11 @@ azmcp keyvault certificate create --subscription <subscription> \
                                   --vault <vault-name> \
                                   --name <certificate-name>
 
-# Gets a certificate in a key vault
+# Get a specific certificate or list all certificates. If --name is provided, returns a specific certificate; otherwise, lists all certificates in the key vault.
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
 azmcp keyvault certificate get --subscription <subscription> \
                                --vault <vault-name> \
-                               --name <certificate-name>
+                               [--name <certificate-name>]
 
 # Imports an existing certificate (PFX or PEM) into a key vault
 # ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ✅ LocalRequired
@@ -1324,11 +1599,6 @@ azmcp keyvault certificate import --subscription <subscription> \
                                   --certificate <certificate-name> \
                                   --certificate-data <path-or-base64-or-raw-pem> \
                                   [--password <pfx-password>]
-
-# Lists certificates in a key vault
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp keyvault certificate list --subscription <subscription> \
-                                --vault <vault-name>
 ```
 
 #### Keys
@@ -1341,17 +1611,12 @@ azmcp keyvault key create --subscription <subscription> \
                           --key <key-name> \
                           --key-type <key-type>
 
-# Get a key in a key vault
+# Get a specific key or list all keys. If --key is provided, returns a specific key; otherwise, lists all keys in the key vault.
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
 azmcp keyvault key get --subscription <subscription> \
                        --vault <vault-name> \
-                       --key <key-name>
-
-# Lists keys in a key vault
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp keyvault key list --subscription <subscription> \
-                        --vault <vault-name> \
-                        --include-managed <true/false>
+                       [--key <key-name>] \
+                       [--include-managed]
 ```
 
 #### Secrets
@@ -1376,16 +1641,11 @@ azmcp keyvault secret create --subscription <subscription> \
                              --name <secret-name> \
                              --value <secret-value>
 
-# Get a secret in a key vault (will prompt for user consent)
+# Get a specific secret or list all secrets. If --secret is provided, returns a specific secret with its value (requires user consent); otherwise, lists all secrets in the key vault (returns secret names and properties, not values).
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ✅ Secret | ❌ LocalRequired
 azmcp keyvault secret get --subscription <subscription> \
                           --vault <vault-name> \
-                          --secret <secret-name>
-
-# Lists secrets in a key vault
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp keyvault secret list --subscription <subscription> \
-                           --vault <vault-name>
+                          [--secret <secret-name>]
 ```
 
 ### Azure Kubernetes Service (AKS) Operations
@@ -1440,40 +1700,52 @@ azmcp loadtesting testresource list --subscription <subscription> \
                                     --resource-group <resource-group> \
                                     --test-resource-name <test-resource-name>
 
-# Create load test run
-# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp loadtesting testrun create --subscription <subscription> \
-                                 --resource-group <resource-group> \
-                                 --test-resource-name <test-resource-name> \
-                                 --test-id <test-id> \
-                                 --testrun-id <testrun-id> \
-                                 --display-name <display-name> \
-                                 --description <description> \
-                                 --old-testrun-id <old-testrun-id>
-
-# Get load test run
+# Get load test run (single run or list all runs for a test)
+# Get a single test run by ID:
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
 azmcp loadtesting testrun get --subscription <subscription> \
                               --resource-group <resource-group> \
                               --test-resource-name <test-resource-name> \
                               --testrun-id <testrun-id>
 
-# List load test run
+# List all test runs for a specific test:
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp loadtesting testrun list --subscription <subscription> \
-                               --resource-group <resource-group> \
-                               --test-resource-name <test-resource-name> \
-                               --test-id <test-id>
+azmcp loadtesting testrun get --subscription <subscription> \
+                              --resource-group <resource-group> \
+                              --test-resource-name <test-resource-name> \
+                              --test-id <test-id>
 
-# Update load test run
-# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp loadtesting testrun update --subscription <subscription> \
-                                 --resource-group <resource-group> \
-                                 --test-resource-name <test-resource-name> \
-                                 --test-id <test-id> \
-                                 --testrun-id <testrun-id> \
-                                 --display-name <display-name> \
-                                 --description <description>
+# Create or update load test run
+# Note: Create operations are NOT idempotent (each creates new execution with unique timestamps).
+#       Update operations ARE idempotent (repeated calls with same values produce same result).
+# Create a new test run:
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp loadtesting testrun createorupdate --subscription <subscription> \
+                                         --resource-group <resource-group> \
+                                         --test-resource-name <test-resource-name> \
+                                         --test-id <test-id> \
+                                         --testrun-id <testrun-id> \
+                                         --display-name <display-name> \
+                                         --description <description>
+
+# Rerun an existing test run:
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp loadtesting testrun createorupdate --subscription <subscription> \
+                                         --resource-group <resource-group> \
+                                         --test-resource-name <test-resource-name> \
+                                         --test-id <test-id> \
+                                         --testrun-id <new-testrun-id> \
+                                         --old-testrun-id <existing-testrun-id>
+
+# Update test run metadata (idempotent):
+# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp loadtesting testrun createorupdate --subscription <subscription> \
+                                         --resource-group <resource-group> \
+                                         --test-resource-name <test-resource-name> \
+                                         --test-id <test-id> \
+                                         --testrun-id <testrun-id> \
+                                         --display-name <updated-display-name> \
+                                         --description <updated-description>
 ```
 
 ### Azure Managed Grafana Operations
@@ -1705,7 +1977,6 @@ azmcp monitor metrics query --subscription <subscription> \
 
 ```bash
 # Create a new web test in Azure Monitor
-# ✅ Destructive | ❌ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
 azmcp monitor webtests create --subscription <subscription> \
                               --resource-group <resource-group> \
                               --webtest-resource <webtest-resource-name> \
@@ -1736,11 +2007,9 @@ azmcp monitor webtests get --subscription <subscription> \
                           --webtest-resource <webtest-resource-name>
 
 # List all web tests in a subscription or optionally, within a resource group
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
 azmcp monitor webtests list --subscription <subscription> [--resource-group <resource-group>]
 
 # Update an existing web test in Azure Monitor
-# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
 azmcp monitor webtests update --subscription <subscription> \
                               --resource-group <resource-group> \
                               --webtest-resource <webtest-resource-name> \
@@ -1763,14 +2032,7 @@ azmcp monitor webtests update --subscription <subscription> \
                               [--ssl-check <true|false>] \
                               [--ssl-lifetime-check <days>] \
                               [--timeout <seconds>]
-```
-
-### Azure Managed Lustre
-
-```bash
-# List Azure Managed Lustre Filesystems available in a subscription or resource group
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp managedlustre fs list --subscription <subscription> \
+ubscription> \
                             --resource-group <resource-group>
 
 # Create an Azure Managed Lustre filesystem
@@ -2046,6 +2308,16 @@ azmcp azuremigrate platformlandingzone request --subscription <subscription> \
                                                   --action status
    ```
 
+6. **Create Azure Migrate Project** (`--action createmigrateproject`)
+   ```bash
+   # Create a new Azure Migrate project if one doesn't exist (requires location parameter)
+   azmcp azuremigrate platformlandingzone request --subscription <subscription> \
+                                                  --resource-group <resource-group> \
+                                                  --migrate-project-name <migrate-project-name> \
+                                                  --action createmigrateproject \
+                                                  --location <azure-region>
+   ```
+
 ### Azure Native ISV Operations
 
 ```bash
@@ -2163,13 +2435,12 @@ azmcp group list --subscription <subscription>
 ### Azure Resource Health Operations
 
 ```bash
-# Get availability status for a specific resource
+# Get availability status for a specific resource or list all resources (dual-mode)
+# With --resourceId: Get availability status for a specific resource
+# Without --resourceId: List availability statuses for all resources in a subscription
 # ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp resourcehealth availability-status get --resourceId <resource-id>
-
-# List availability statuses for all resources in a subscription
-# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
-azmcp resourcehealth availability-status list --subscription <subscription> \
+azmcp resourcehealth availability-status get --subscription <subscription> \
+                                              [--resourceId <resource-id>] \
                                               [--resource-group <resource-group>]
 
 # List service health events in a subscription
@@ -2202,6 +2473,32 @@ azmcp servicebus topic subscription details --subscription <subscription> \
                                             --namespace <service-bus-namespace> \
                                             --topic <topic> \
                                             --subscription-name <subscription-name>
+```
+
+### Azure Service Fabric Operations
+
+#### Managed Cluster Node
+
+```bash
+# Get nodes for a Service Fabric managed cluster (all nodes, or a single node by name)
+# ❌ Destructive | ✅ Idempotent | ❌ OpenWorld | ✅ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp servicefabric managedcluster node get --subscription <subscription> \
+                                            --resource-group <resource-group> \
+                                            --cluster <cluster> \
+                                            [--node <node>]
+```
+
+#### Managed Cluster Node Type
+
+```bash
+# Restart nodes of a specific node type in a Service Fabric managed cluster
+# ✅ Destructive | ✅ Idempotent | ❌ OpenWorld | ❌ ReadOnly | ❌ Secret | ❌ LocalRequired
+azmcp servicefabric managedcluster nodetype restart --subscription <subscription> \
+                                                    --resource-group <resource-group> \
+                                                    --cluster <cluster> \
+                                                    --node-type <node-type> \
+                                                    --nodes <node1> [--nodes <node2> ...] \
+                                                    [--update-type <Default|ByUpgradeDomain>]
 ```
 
 ### Azure SignalR Service Operations

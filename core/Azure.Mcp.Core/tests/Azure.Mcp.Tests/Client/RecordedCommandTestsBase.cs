@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using Azure.Mcp.Tests.Client.Attributes;
 using Azure.Mcp.Tests.Client.Helpers;
-using Azure.Mcp.Tests.Generated;
 using Azure.Mcp.Tests.Generated.Models;
 using Azure.Mcp.Tests.Helpers;
 using Xunit;
@@ -15,7 +14,7 @@ using Xunit.v3;
 
 namespace Azure.Mcp.Tests.Client;
 
-public abstract class RecordedCommandTestsBase(ITestOutputHelper output, TestProxyFixture fixture) : CommandTestsBase(output), IClassFixture<TestProxyFixture>
+public abstract class RecordedCommandTestsBase(ITestOutputHelper output, TestProxyFixture fixture, LiveServerFixture liveServerFixture) : CommandTestsBase(output, liveServerFixture), IClassFixture<TestProxyFixture>, IClassFixture<LiveServerFixture>
 {
     private const string EmptyGuid = "00000000-0000-0000-0000-000000000000";
 
@@ -119,6 +118,35 @@ public abstract class RecordedCommandTestsBase(ITestOutputHelper output, TestPro
         {
             // retrieve the value from the recording
             value = TestVariables[name];
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    /// Registers a variable or retrieves it from the test resources deployment outputs. This is a convenience 
+    /// equivalent to calling <see cref="RegisterOrRetrieveVariable(string, string)"/> with a value from the
+    /// <see cref="LiveTestSettings.DeploymentOutputs"/> dictionary. This gets around issues in playback where the
+    /// actual deployment output values may not be present, but the test still needs to run with consistent values that
+    /// are captured in the recording file.
+    /// If th test mode is playback, it will load attempt to load the variable and return it. If the test mode is
+    /// record, it will store the value and return it. If the test mode is live, it will retrieve the value from the
+    /// deployment outputs but won't store it anywhere.
+    /// </summary>
+    /// <param name="name">The name of the variable to register or retrieve.</param>
+    /// <param name="deploymentOutputName">The deployment output name.</param>
+    /// <returns>The value of the variable.</returns>
+    public virtual string RegisterOrRetrieveDeploymentOutputVariable(string name, string deploymentOutputName)
+    {
+        if (TestMode == TestMode.Playback)
+        {
+            return TestVariables[name];
+        }
+
+        var value = Settings.DeploymentOutputs[deploymentOutputName];
+        if (TestMode == TestMode.Record)
+        {
+            TestVariables[name] = value;
         }
 
         return value;

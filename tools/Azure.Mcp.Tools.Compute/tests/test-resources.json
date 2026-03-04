@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.39.26.7824",
-      "templateHash": "6489926815758586760"
+      "templateHash": "15386900013071109327"
     }
   },
   "parameters": {
@@ -118,7 +118,8 @@
             "managedDisk": {
               "storageAccountType": "Standard_LRS"
             }
-          }
+          },
+          "diskControllerType": "SCSI"
         },
         "osProfile": {
           "computerName": "[format('{0}-vm', parameters('baseName'))]",
@@ -175,7 +176,8 @@
               "managedDisk": {
                 "storageAccountType": "Standard_LRS"
               }
-            }
+            },
+            "diskControllerType": "SCSI"
           },
           "osProfile": {
             "computerNamePrefix": "[format('{0}-', parameters('baseName'))]",
@@ -230,6 +232,48 @@
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "description": "Reader for testApplicationOid"
       }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7'), parameters('testApplicationOid'), resourceGroup().id)]",
+      "properties": {
+        "principalId": "[parameters('testApplicationOid')]",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
+        "description": "Network Contributor for testApplicationOid - required for VM create tests"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/disks",
+      "apiVersion": "2023-10-02",
+      "name": "[format('{0}-disk', parameters('baseName'))]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "properties": {
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "diskSizeGB": 32
+      },
+      "tags": {
+        "Environment": "Test",
+        "Purpose": "MCP-Testing"
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[format('Microsoft.Compute/disks/{0}', format('{0}-disk', parameters('baseName')))]",
+      "name": "[guid(subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c'), parameters('testApplicationOid'), resourceId('Microsoft.Compute/disks', format('{0}-disk', parameters('baseName'))))]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+        "principalId": "[parameters('testApplicationOid')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/disks', format('{0}-disk', parameters('baseName')))]"
+      ]
     }
   ],
   "outputs": {
@@ -248,6 +292,14 @@
     "resourceGroupName": {
       "type": "string",
       "value": "[resourceGroup().name]"
+    },
+    "diskName": {
+      "type": "string",
+      "value": "[format('{0}-disk', parameters('baseName'))]"
+    },
+    "location": {
+      "type": "string",
+      "value": "[parameters('location')]"
     }
   }
 }

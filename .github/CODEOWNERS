@@ -295,10 +295,10 @@
 # ServiceOwners:                        @carldc @philon-msft @xiangyan99
 
 # PRLabel: %tools-ResourceHealth
-/tools/Azure.Mcp.Tools.ResourceHealth/     @pkaza-msft @microsoft/azure-mcp
+/tools/Azure.Mcp.Tools.ResourceHealth/     @shdesmu @microsoft/azure-mcp
 
 # ServiceLabel: %tools-ResourceHealth
-# ServiceOwners:                           @pkaza-msft @microsoft/azure-mcp
+# ServiceOwners:                           @shdesmu @microsoft/azure-mcp
 
 # PRLabel: %tools-Search
 /tools/Azure.Mcp.Tools.Search/         @pablocastro @jongio @microsoft/azure-mcp
@@ -311,6 +311,12 @@
 
 # ServiceLabel: %tools-ServiceBus
 # ServiceOwners:                       @anuchandy @conniey @EldertGrootenboer @shankarsama
+
+# PRLabel: %tools-ServiceFabric
+/tools/Azure.Mcp.Tools.ServiceFabric/  @linmeng08 @jkochhar @microsoft/azure-mcp
+
+# ServiceLabel: %tools-ServiceFabric
+# ServiceOwners:                       @linmeng08 @jkochhar
 
 # PRLabel: %tools-SignalR
 /tools/Azure.Mcp.Tools.SignalR/        @HaofanLiao @JialinXin @kenchennt @microsoft/azure-mcp

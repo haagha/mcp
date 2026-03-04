@@ -130,19 +130,15 @@
         }
       },
       "mappedToolList": [
-        "mysql_database_list",
+        "mysql_list",
         "mysql_database_query",
         "mysql_server_config_get",
-        "mysql_server_list",
         "mysql_server_param_get",
-        "mysql_table_list",
         "mysql_table_schema_get",
-        "postgres_database_list",
+        "postgres_list",
         "postgres_database_query",
         "postgres_server_config_get",
-        "postgres_server_list",
         "postgres_server_param_get",
-        "postgres_table_list",
         "postgres_table_schema_get",
         "sql_db_list",
         "sql_db_show",
@@ -333,49 +329,14 @@
         "monitor_table_list",
         "monitor_table_type_list",
         "monitor_webtests_get",
-        "monitor_webtests_list",
         "monitor_workspace_log_query",
         "resourcehealth_availability-status_get",
-        "resourcehealth_availability-status_list",
         "resourcehealth_health-events_list"
       ]
     },
     {
-      "name": "create_azure_monitor_webtests",
-      "description": "Create Azure Monitor web tests for application availability monitoring.",
-      "toolMetadata": {
-        "destructive": {
-          "value": true,
-          "description": "This tool may delete or modify existing resources in its environment."
-        },
-        "idempotent": {
-          "value": false,
-          "description": "Running this operation multiple times with the same arguments may have additional effects or produce different results."
-        },
-        "openWorld": {
-          "value": false,
-          "description": "This tool's domain of interaction is closed and well-defined, limited to a specific set of entities."
-        },
-        "readOnly": {
-          "value": false,
-          "description": "This tool may modify its environment by creating, updating, or deleting data."
-        },
-        "secret": {
-          "value": false,
-          "description": "This tool does not handle sensitive or secret information."
-        },
-        "localRequired": {
-          "value": false,
-          "description": "This tool is available in both local and remote server modes."
-        }
-      },
-      "mappedToolList": [
-        "monitor_webtests_create"
-      ]
-    },
-    {
-      "name": "update_azure_monitor_webtests",
-      "description": "Update Azure Monitor web tests for application availability monitoring.",
+      "name": "create_or_update_azure_monitor_webtests",
+      "description": "Create or update Azure Monitor web tests for application availability monitoring.",
       "toolMetadata": {
         "destructive": {
           "value": true,
@@ -403,7 +364,7 @@
         }
       },
       "mappedToolList": [
-        "monitor_webtests_update"
+        "monitor_webtests_createorupdate"
       ]
     },
     {
@@ -939,16 +900,13 @@
       },
       "mappedToolList": [
         "keyvault_certificate_get",
-        "keyvault_certificate_list",
         "keyvault_key_get",
-        "keyvault_key_list",
-        "keyvault_secret_list",
         "keyvault_admin_settings_get"
       ]
     },
     {
       "name": "get_azure_key_vault_secret_values",
-      "description": "Retrieve the actual secret values from Azure Key Vault. Use this tool when you need to access the sensitive content of a secret, not just its metadata or properties.",
+      "description": "Retrieve the actual secret values or list secrets from Azure Key Vault. Use this tool when you need to access the sensitive content of a secret or properties of all secrets.",
       "toolMetadata": {
         "destructive": {
           "value": false,
@@ -1182,13 +1140,12 @@
       "mappedToolList": [
         "loadtesting_testresource_list",
         "loadtesting_test_get",
-        "loadtesting_testrun_get",
-        "loadtesting_testrun_list"
+        "loadtesting_testrun_get"
       ]
     },
     {
-      "name": "create_azure_load_testing",
-      "description": "Create Load Testing resource or execute Azure Load Testing tests.",
+      "name": "create_or_update_azure_load_testing",
+      "description": "Create or Update Load Testing resource or execute Azure Load Testing tests.",
       "toolMetadata": {
         "destructive": {
           "value": true,
@@ -1218,40 +1175,7 @@
       "mappedToolList": [
         "loadtesting_test_create",
         "loadtesting_testresource_create",
-        "loadtesting_testrun_create"
-      ]
-    },
-    {
-      "name": "update_azure_load_testing_configurations",
-      "description": "Update Azure Load Testing configurations and test run settings.",
-      "toolMetadata": {
-        "destructive": {
-          "value": true,
-          "description": "This tool may delete or modify existing resources in its environment."
-        },
-        "idempotent": {
-          "value": true,
-          "description": "Running this operation multiple times with the same arguments produces the same result without additional effects."
-        },
-        "openWorld": {
-          "value": false,
-          "description": "This tool's domain of interaction is closed and well-defined, limited to a specific set of entities."
-        },
-        "readOnly": {
-          "value": false,
-          "description": "This tool may modify its environment by creating, updating, or deleting data."
-        },
-        "secret": {
-          "value": false,
-          "description": "This tool does not handle sensitive or secret information."
-        },
-        "localRequired": {
-          "value": false,
-          "description": "This tool is available in both local and remote server modes."
-        }
-      },
-      "mappedToolList": [
-        "loadtesting_testrun_update"
+        "loadtesting_testrun_createorupdate"
       ]
     },
     {
@@ -1542,6 +1466,41 @@
         "managedlustre_fs_subnetsize_ask",
         "managedlustre_fs_subnetsize_validate",
         "storage_table_list"
+      ]
+    },
+    {
+      "name": "get_azure_compute_details",
+      "description": "Get details about Azure compute resources including Virtual Machines (VMs), Virtual Machine Scale Sets (VMSS), and managed disks. List VMs across subscriptions or within resource groups, retrieve detailed VM information including size, OS type, provisioning state, power state (with instance view), and configuration. Get VMSS details including SKU, capacity, upgrade policy, and provisioning state. View disk properties, state, size, SKU, OS type, and provisioning status. Supports wildcard patterns for disk name filtering.",
+      "toolMetadata": {
+        "destructive": {
+          "value": false,
+          "description": "This tool performs only additive updates without deleting or modifying existing resources."
+        },
+        "idempotent": {
+          "value": true,
+          "description": "Running this operation multiple times with the same arguments produces the same result without additional effects."
+        },
+        "openWorld": {
+          "value": false,
+          "description": "This tool's domain of interaction is closed and well-defined, limited to a specific set of entities."
+        },
+        "readOnly": {
+          "value": true,
+          "description": "This tool only performs read operations without modifying any state or data."
+        },
+        "secret": {
+          "value": false,
+          "description": "This tool does not handle sensitive or secret information."
+        },
+        "localRequired": {
+          "value": false,
+          "description": "This tool is available in both local and remote server modes."
+        }
+      },
+      "mappedToolList": [
+        "compute_disk_get",
+        "compute_vm_get",
+        "compute_vmss_get"
       ]
     },
     {
@@ -2280,24 +2239,58 @@
       ]
     },
     {
-      "name": "get_azure_compute_resources",
-      "description": "Get details about Azure compute resources including Virtual Machines (VMs) and Virtual Machine Scale Sets (VMSS). List VMs across subscriptions or within resource groups, retrieve detailed VM information including size, OS type, provisioning state, power state (with instance view), and configuration. Get VMSS details including SKU, capacity, upgrade policy, and provisioning state.",
+      "name": "create_azure_compute_resources",
+      "description": "Create Azure compute resources including Virtual Machines (VMs) and Virtual Machine Scale Sets (VMSS). Create VMs with smart workload-based defaults (development, web, database, compute, memory, gpu, general). Supports Linux and Windows with SSH key or password authentication. Create VMSS for scalable workloads with configurable instance count and upgrade policies.",
       "toolMetadata": {
         "destructive": {
-          "value": false,
-          "description": "This tool performs only additive updates without deleting or modifying existing resources."
+          "value": true,
+          "description": "This tool creates new resources which may incur costs."
         },
         "idempotent": {
-          "value": true,
-          "description": "Running this operation multiple times with the same arguments produces the same result without additional effects."
+          "value": false,
+          "description": "Running this operation multiple times may create duplicate resources."
         },
         "openWorld": {
           "value": false,
           "description": "This tool's domain of interaction is closed and well-defined, limited to a specific set of entities."
         },
         "readOnly": {
+          "value": false,
+          "description": "This tool creates new Azure resources."
+        },
+        "secret": {
           "value": true,
-          "description": "This tool only performs read operations without modifying any state or data."
+          "description": "This tool handles sensitive authentication information like passwords and SSH keys."
+        },
+        "localRequired": {
+          "value": false,
+          "description": "This tool is available in both local and remote server modes."
+        }
+      },
+      "mappedToolList": [
+        "compute_vm_create",
+        "compute_vmss_create"
+      ]
+    },
+    {
+      "name": "update_azure_compute_resources",
+      "description": "Update Azure compute resources including Virtual Machines (VMs) and Virtual Machine Scale Sets (VMSS). Modify VM properties like size, tags, license type, boot diagnostics, and user data. Update VMSS capacity, upgrade policy, overprovision settings, auto OS upgrade, and scale-in policies. Uses PATCH semantics - only specified properties are updated.",
+      "toolMetadata": {
+        "destructive": {
+          "value": true,
+          "description": "This tool modifies existing resources."
+        },
+        "idempotent": {
+          "value": true,
+          "description": "Running this operation multiple times with the same arguments produces the same result."
+        },
+        "openWorld": {
+          "value": false,
+          "description": "This tool's domain of interaction is closed and well-defined, limited to a specific set of entities."
+        },
+        "readOnly": {
+          "value": false,
+          "description": "This tool modifies Azure resources."
         },
         "secret": {
           "value": false,
@@ -2309,8 +2302,8 @@
         }
       },
       "mappedToolList": [
-        "compute_vm_get",
-        "compute_vmss_get"
+        "compute_vm_update",
+        "compute_vmss_update"
       ]
     },
     {
@@ -2379,6 +2372,72 @@
       },
       "mappedToolList": [
         "signalr_runtime_get"
+      ]
+    },
+    {
+      "name": "get_azure_service_fabric_managed_cluster_nodes",
+      "description": "Get nodes in an Azure Service Fabric managed cluster including node name, type, status, IP address, fault domain, upgrade domain, health state, and seed node status. Returns all nodes by default, or a single node when a node name is specified.",
+      "toolMetadata": {
+        "destructive": {
+          "value": false,
+          "description": "This tool performs only additive updates without deleting or modifying existing resources."
+        },
+        "idempotent": {
+          "value": true,
+          "description": "Running this operation multiple times with the same arguments produces the same result without additional effects."
+        },
+        "openWorld": {
+          "value": false,
+          "description": "This tool's domain of interaction is closed and well-defined, limited to a specific set of entities."
+        },
+        "readOnly": {
+          "value": true,
+          "description": "This tool only performs read operations without modifying any state or data."
+        },
+        "secret": {
+          "value": false,
+          "description": "This tool does not handle sensitive or secret information."
+        },
+        "localRequired": {
+          "value": false,
+          "description": "This tool is available in both local and remote server modes."
+        }
+      },
+      "mappedToolList": [
+        "servicefabric_managedcluster_node_get"
+      ]
+    },
+    {
+      "name": "restart_azure_service_fabric_managed_cluster_nodes",
+      "description": "Restart nodes of a specific node type in an Azure Service Fabric managed cluster. Specify the node names and optionally the update type (Default or ByUpgradeDomain).",
+      "toolMetadata": {
+        "destructive": {
+          "value": true,
+          "description": "This tool restarts nodes which temporarily disrupts workloads running on those nodes."
+        },
+        "idempotent": {
+          "value": true,
+          "description": "Running this operation multiple times with the same arguments produces the same result without additional effects."
+        },
+        "openWorld": {
+          "value": false,
+          "description": "This tool's domain of interaction is closed and well-defined, limited to a specific set of entities."
+        },
+        "readOnly": {
+          "value": false,
+          "description": "This tool performs write operations that modify cluster node state."
+        },
+        "secret": {
+          "value": false,
+          "description": "This tool does not handle sensitive or secret information."
+        },
+        "localRequired": {
+          "value": false,
+          "description": "This tool is available in both local and remote server modes."
+        }
+      },
+      "mappedToolList": [
+        "servicefabric_managedcluster_nodetype_restart"
       ]
     },
     {
@@ -3205,6 +3264,39 @@
       },
       "mappedToolList": [
         "azuremigrate_platformlandingzone_getguidance"
+      ]
+    },
+    {
+      "name": "get_azure_appservice_details",
+      "description": "Get details about Azure App Service resources including Web Apps.",
+      "toolMetadata": {
+        "destructive": {
+          "value": false,
+          "description": "This tool performs only additive updates without deleting or modifying existing resources."
+        },
+        "idempotent": {
+          "value": true,
+          "description": "Running this operation multiple times with the same arguments produces the same result without additional effects."
+        },
+        "openWorld": {
+          "value": false,
+          "description": "This tool's domain of interaction is closed and well-defined, limited to a specific set of entities."
+        },
+        "readOnly": {
+          "value": true,
+          "description": "This tool only performs read operations without modifying any state or data."
+        },
+        "secret": {
+          "value": false,
+          "description": "This tool does not handle sensitive or secret information."
+        },
+        "localRequired": {
+          "value": false,
+          "description": "This tool is available in both local and remote server modes."
+        }
+      },
+      "mappedToolList": [
+        "appservice_webapps_get"
       ]
     }
   ]

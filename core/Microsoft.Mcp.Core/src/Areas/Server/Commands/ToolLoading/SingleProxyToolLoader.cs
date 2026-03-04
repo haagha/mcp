@@ -2,15 +2,14 @@
 // Licensed under the MIT License.
 
 using System.Diagnostics;
-using Azure.Mcp.Core.Areas.Server.Commands.Discovery;
 using Microsoft.Extensions.Logging;
-using Microsoft.Mcp.Core.Areas;
+using Microsoft.Mcp.Core.Areas.Server.Commands.Discovery;
 using Microsoft.Mcp.Core.Commands;
 using ModelContextProtocol;
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
 
-namespace Azure.Mcp.Core.Areas.Server.Commands.ToolLoading;
+namespace Microsoft.Mcp.Core.Areas.Server.Commands.ToolLoading;
 
 public sealed class SingleProxyToolLoader(IMcpDiscoveryStrategy discoveryStrategy, ILogger<SingleProxyToolLoader> logger) : BaseToolLoader(logger)
 {
@@ -70,9 +69,9 @@ public sealed class SingleProxyToolLoader(IMcpDiscoveryStrategy discoveryStrateg
     {
         var toolsResult = new ListToolsResult
         {
-            Tools = new List<Tool>
-            {
-                new Tool
+            Tools =
+            [
+                new()
                 {
                     Name = "azure",
                     Description = """
@@ -84,11 +83,11 @@ public sealed class SingleProxyToolLoader(IMcpDiscoveryStrategy discoveryStrateg
                         To execute an action, set the "tool", "command", and convert the users intent into the "parameters" based on the discovered schema.
                         Always use this tool for any Azure or "azd" related operation requiring up-to-date, dynamic, and interactive capabilities.
                         Always include the "intent" parameter to specify the operation you want to perform.
-                    """,
+                        """,
                     Annotations = new ToolAnnotations(),
                     InputSchema = ToolSchema,
                 }
-            },
+            ],
         };
 
         return ValueTask.FromResult(toolsResult);
@@ -102,6 +101,7 @@ public sealed class SingleProxyToolLoader(IMcpDiscoveryStrategy discoveryStrateg
     /// <returns>A <see cref="CallToolResult"/> representing the result of the operation.</returns>
     public override async ValueTask<CallToolResult> CallToolHandler(RequestContext<CallToolRequestParams> request, CancellationToken cancellationToken = default)
     {
+        Activity.Current?.SetTag(TagName.IsServerCommandInvoked, false);
         var args = request.Params?.Arguments;
         string? intent = null;
         bool learn = false;
@@ -156,7 +156,7 @@ public sealed class SingleProxyToolLoader(IMcpDiscoveryStrategy discoveryStrateg
                         The "tool" and "command" parameters are required when not learning
                         Run again with the "learn" argument to get a list of available tools and their parameters.
                         To learn about a specific tool, use the "tool" argument with the name of the tool.
-                    """
+                        """
                 }
             ]
         };
@@ -193,7 +193,7 @@ public sealed class SingleProxyToolLoader(IMcpDiscoveryStrategy discoveryStrateg
     }
 
     /// <summary>
-    /// Gets the set of <see cref="Microsoft.Mcp.Core.Commands.IBaseCommand"/> within an <see cref="Microsoft.Mcp.Core.Areas.IAreaSetup">.
+    /// Gets the set of <see cref="IBaseCommand"/> within an <see cref="IAreaSetup">.
     /// </summary>
     /// <param name="request">Calling request</param>
     /// <param name="tool">Name of the <see cref="IAreaSetup"/> to get commands for.</param>
@@ -247,8 +247,7 @@ public sealed class SingleProxyToolLoader(IMcpDiscoveryStrategy discoveryStrateg
 
     private async Task<CallToolResult> ToolLearnModeAsync(RequestContext<CallToolRequestParams> request, string intent, string tool, CancellationToken cancellationToken)
     {
-        var activity = Activity.Current?
-            .SetTag(TagName.IsServerCommandInvoked, false)
+        Activity.Current?.SetTag(TagName.IsServerCommandInvoked, false)
             .SetTag(TagName.ToolArea, tool);
 
         var toolsJson = await GetToolListJsonAsync(request, tool, cancellationToken);
@@ -305,13 +304,9 @@ public sealed class SingleProxyToolLoader(IMcpDiscoveryStrategy discoveryStrateg
             return await RootLearnModeAsync(request, intent, cancellationToken);
         }
 
-        var activity = Activity.Current;
-        if (activity != null)
-        {
-            activity.SetTag(TagName.IsServerCommandInvoked, true)
-                    .SetTag(TagName.ToolArea, tool)
-                    .SetTag(TagName.ToolName, command);
-        }
+        Activity.Current?.SetTag(TagName.IsServerCommandInvoked, true)
+            .SetTag(TagName.ToolArea, tool)
+            .SetTag(TagName.ToolName, command);
 
         try
         {
